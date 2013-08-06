@@ -5,48 +5,64 @@
 
 require 'securerandom'
 require 'colorize'
-# helps you remember a password
-
+# set @pass to user input or generated password
+def get_pass
 	puts "enter your password "
-	pass = gets.chomp
-	pass = SecureRandom.base64(20).slice(0..11) if pass.empty?
-system("clear")
-pass_arr = pass.chars.each_slice(4).map(&:join)
-p pass
-`say -r110 -v Vick #{pass}`
+	@pass = gets.chomp
+	@pass = SecureRandom.base64(20).slice(0..11) if @pass.empty?
+end
+
+get_pass
+p @pass
 sleep 2
-system("clear")
-pass_arr.each do |ele|
-  `say -r110 -v Vick #{ele}`
-  system("clear")
-  ans = nil
-  until ans == ele do
-    p ele
-    sleep 1.5
-    system("clear")
-    puts "type it! "
-    ans = gets.chomp
-    system("clear")
-		unless ans == ele
-			puts "try again".red
+system('clear')
+
+# split the pass into easier to remember sections
+def break_up
+	@pass_arr = @pass.chars.each_slice(4).map(&:join)
+end
+break_up
+
+# say and print password or element
+def say_write(word)
+	p word	
+	`say -r110 -v Vick #{word}`
+end
+
+def say_write_test(word,wrong=nil)
+	if wrong
+		puts "try again".on_red.white
+	end
+	p word	
+	`say -r110 -v Vick #{word}`
+end
+
+def check_it(word)
+	ans = nil
+	until ans == word do
+		say_write(word)
+		sleep 1.5
+		system("clear")
+		puts "type it! "
+		ans = gets.chomp
+		system("clear")
+		unless ans == word
+			say_write_test(word,"wrong")
 			sleep 1
-			`say -r110 -v Vick #{ele}`
 		end
 	end
 end
-pas ||=nil
-until pas == pass do
-	p pass
-	`say -r110 -v Vick #{pass}`
-	sleep 1.5
-	system("clear")
-	puts "type it! "
-	pas = gets.chomp
-	system("clear")
-	unless pas == pass
-		puts "try again".red
-		sleep 1
-		`say -r110 -v Vick #{pass}`
-		sleep 0.5
-	end
+
+@pass_arr.each do |ele|
+	say_write(ele)
+	system('clear')
+	ans = nil
+	check_it(ele)
 end
+
+@pass_arr.each do |word|
+	say_write(word)
+	sleep 1
+	system('clear')
+end
+check_it(@pass)
